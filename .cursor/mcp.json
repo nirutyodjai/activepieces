@@ -2,6 +2,28 @@
   "mcpServers": {
     "nx-mcp": {
       "url": "http://localhost:9536/sse"
+    },
+    "figma-mcp": {
+      "command": "npx",
+      "args": ["@figma/mcp-server"],
+      "env": {
+        "FIGMA_ACCESS_TOKEN": "${FIGMA_ACCESS_TOKEN}"
+      }
+    },
+    "activepieces-figma": {
+      "command": "node",
+      "args": ["packages/tools/figma/fetch-figma-file.js"],
+      "env": {
+        "FIGMA_TOKEN": "${FIGMA_TOKEN}",
+        "FIGMA_FILE_ID": "${FIGMA_FILE_ID}"
+      }
+    },
+    "replicate-flux-mcp": {
+      "command": "node",
+      "args": ["replicate-flux-mcp/build/index.js"],
+      "env": {
+        "REPLICATE_API_TOKEN": "${REPLICATE_API_TOKEN}"
+      }
     }
   }
 }

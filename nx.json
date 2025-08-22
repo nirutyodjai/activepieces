@@ -116,5 +116,14 @@
       "preVersionCommand": "npx nx run-many -t build"
     }
   },
-  "useLegacyCache": true
+  "useLegacyCache": true,
+  "scripts": {
+    "build": "nx build",
+    "test": "nx test",
+    "lint": "nx lint",
+    "figma:fetch": "node ./packages/tools/figma/fetch-figma-file.js",
+    "upgrade": "nx migrate latest",
+    "integration-test": "nx run-many --target=test --all",
+    "nirutyodjai": "node ./scripts/nirutyodjai.js"
+  }
 }

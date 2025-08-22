@@ -1,5 +1,4 @@
 import { createAction, Property } from '@activepieces/pieces-framework';
-import { PDFDocument } from 'pdf-lib';
 import { MarkdownVariant } from '@activepieces/shared';
 
 export function pageRangeToIndexes(
@@ -97,17 +96,18 @@ export const extractPdfPages = createAction({
   },
   async run(context) {
     try {
+      const { PDFDocument } = await import('pdf-lib');
       const srcDoc = await PDFDocument.load(context.propsValue.file.data);
 
       const totalPages = srcDoc.getPageCount();
-      const pageIndexes = context.propsValue.pageRanges.flatMap(
-        (pageRange: any) =>
-          pageRangeToIndexes(pageRange.startPage, pageRange.endPage, totalPages)
+      const pageRanges = context.propsValue.pageRanges as Array<{ startPage: number; endPage: number }>;
+      const pageIndexes = pageRanges.flatMap((pageRange) =>
+        pageRangeToIndexes(pageRange.startPage, pageRange.endPage, totalPages)
       );
 
       const newDoc = await PDFDocument.create();
-      const newPages = await newDoc.copyPages(srcDoc, pageIndexes);
-      newPages.forEach((newPage) => newDoc.addPage(newPage));
+      const newPages: any[] = await newDoc.copyPages(srcDoc, pageIndexes);
+      newPages.forEach((newPage: any) => newDoc.addPage(newPage));
 
       const pdfBytes = await newDoc.save();
       const base64Pdf = Buffer.from(pdfBytes).toString('base64');

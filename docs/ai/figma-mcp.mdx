@@ -1,0 +1,189 @@
+---
+title: "Figma MCP Integration"
+description: "การตั้งค่าและใช้งาน Figma Model Context Protocol (MCP) Server กับ Activepieces"
+---
+
+# Figma MCP Integration
+
+การผสานรวม Figma MCP (Model Context Protocol) ช่วยให้ AI สามารถเข้าถึงและทำงานกับ Figma designs ได้โดยตรง ทำให้สามารถสร้าง design-to-code automation ได้อย่างมีประสิทธิภาพ
+
+## ความสามารถของ Figma MCP
+
+- **Design Context Access**: เข้าถึงข้อมูล components, variables, และ styles จาก Figma files
+- **Code Connect Integration**: เชื่อมโยง design กับ code implementations
+- **Automated Code Generation**: สร้าง code จาก design specifications
+- **Design System Sync**: ซิงค์ design tokens และ components
+
+## การตั้งค่า Environment Variables
+
+1. สร้างไฟล์ `.env` จาก template:
+   ```bash
+   cp .env.figma.example .env
+   ```
+
+2. กรอกข้อมูลที่จำเป็น:
+   ```env
+   FIGMA_ACCESS_TOKEN=your_figma_personal_access_token
+   FIGMA_TOKEN=your_figma_personal_access_token
+   FIGMA_FILE_ID=your_figma_file_id
+   ```
+
+### การสร้าง Figma Personal Access Token
+
+1. ไปที่ [Figma Developer Settings](https://www.figma.com/developers/api#access-tokens)
+2. คลิก "Create new personal access token"
+3. ตั้งชื่อ token และเลือก scope ที่ต้องการ
+4. คัดลอก token และเก็บไว้อย่างปลอดภัย
+
+### การหา Figma File ID
+
+จาก URL ของ Figma file:
+```
+https://www.figma.com/file/ABC123DEF456/Your-Design-File
+```
+File ID คือ: `ABC123DEF456`
+
+## การกำหนดค่า MCP Servers
+
+### Cursor IDE Configuration
+
+ไฟล์ `.cursor/mcp.json` ได้รับการกำหนดค่าแล้วสำหรับ:
+
+- **figma-mcp**: Official Figma MCP server
+- **activepieces-figma**: Custom Activepieces Figma integration
+- **nx-mcp**: Existing NX monorepo integration
+
+### Continue.dev Configuration
+
+ไฟล์ `app/.continue/mcpServers/new-mcp-server.yaml` ได้รับการกำหนดค่าสำหรับ Figma MCP server
+
+## การใช้งาน
+
+### 1. เริ่มต้น MCP Servers
+
+```bash
+# ติดตั้ง Figma MCP server
+npm install -g @figma/mcp-server
+
+# หรือใช้ npx (จะติดตั้งอัตโนมัติ)
+npx @figma/mcp-server
+```
+
+### 2. ทดสอบการเชื่อมต่อ
+
+```bash
+# ทดสอบ Figma API connection
+node packages/tools/figma/fetch-figma-file.js
+```
+
+### 3. ใช้งานกับ AI Coding Assistants
+
+เมื่อตั้งค่าเรียบร้อยแล้ว AI จะสามารถ:
+
+- อ่านข้อมูล design จาก Figma files
+- สร้าง React components จาก Figma designs
+- ซิงค์ design tokens และ CSS variables
+- สร้าง responsive layouts ตาม Figma specifications
+
+## ตัวอย่างการใช้งาน
+
+### การสร้าง Component จาก Figma Design
+
+```typescript
+// AI สามารถสร้าง code นี้จาก Figma design
+import React from 'react';
+import { Button } from '@activepieces/ui';
+
+interface ButtonProps {
+  variant: 'primary' | 'secondary';
+  size: 'sm' | 'md' | 'lg';
+  children: React.ReactNode;
+}
+
+export const FigmaButton: React.FC<ButtonProps> = ({ 
+  variant, 
+  size, 
+  children 
+}) => {
+  return (
+    <Button 
+      className={`btn-${variant} btn-${size}`}
+    >
+      {children}
+    </Button>
+  );
+};
+```
+
+### การดึง Design Tokens
+
+```javascript
+// ใช้ Figma API ผ่าน MCP เพื่อดึง design tokens
+const designTokens = await figma.getDesignTokens({
+  fileId: process.env.FIGMA_FILE_ID,
+  includeColors: true,
+  includeTypography: true,
+  includeSpacing: true
+});
+```
+
+## การแก้ไขปัญหา
+
+### ปัญหาที่พบบ่อย
+
+1. **Token ไม่ถูกต้อง**
+   - ตรวจสอบ FIGMA_ACCESS_TOKEN ใน .env
+   - ตรวจสอบว่า token ยังไม่หมดอายุ
+
+2. **File ID ไม่ถูกต้อง**
+   - ตรวจสอบ URL ของ Figma file
+   - ตรวจสอบสิทธิ์การเข้าถึงไฟล์
+
+3. **MCP Server ไม่เริ่มต้น**
+   - ตรวจสอบการติดตั้ง @figma/mcp-server
+   - ตรวจสอบ environment variables
+
+### การ Debug
+
+```bash
+# ตรวจสอบ environment variables
+echo $FIGMA_ACCESS_TOKEN
+echo $FIGMA_FILE_ID
+
+# ทดสอบ Figma API
+curl -H "Authorization: Bearer $FIGMA_ACCESS_TOKEN" \
+     "https://api.figma.com/v1/files/$FIGMA_FILE_ID"
+```
+
+## การพัฒนาเพิ่มเติม
+
+### การสร้าง Custom MCP Tools
+
+สามารถสร้าง custom MCP tools สำหรับ Figma integration:
+
+```typescript
+// packages/pieces/community/figma/src/lib/mcp/figma-mcp-tools.ts
+import { McpTool } from '@activepieces/pieces-framework';
+
+export const figmaDesignToCodeTool: McpTool = {
+  name: 'figma-design-to-code',
+  description: 'Convert Figma design to React component',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      nodeId: { type: 'string' },
+      componentType: { type: 'string', enum: ['react', 'vue', 'angular'] }
+    }
+  },
+  execute: async ({ nodeId, componentType }) => {
+    // Implementation here
+  }
+};
+```
+
+## อ้างอิง
+
+- [Figma API Documentation](https://www.figma.com/developers/api)
+- [Model Context Protocol](https://modelcontextprotocol.io/)
+- [Figma MCP Server](https://github.com/figma/mcp-server)
+- [Activepieces MCP Documentation](./mcp.mdx)

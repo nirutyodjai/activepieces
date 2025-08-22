@@ -4,7 +4,10 @@ import { experimental_createMCPClient, tool } from 'ai'
 import { z, ZodRawShape, ZodSchema } from 'zod'
 import { tablesApiService } from '../api/server-api.service'
 
-export const agentTools = async <T extends AgentJobSource>(params: AgentToolsParams<T>) => {
+export const agentTools = async <T extends AgentJobSource>(params: AgentToolsParams<T>): Promise<{
+    tools: () => Promise<Record<string, any>>
+    close: () => Promise<void>
+}> => {
     const mcpClient = await getMcpClient(params)
     const builtInTools = await buildInternalTools(params)
     const mcpTools = isNil(await mcpClient?.tools()) ? {} : await mcpClient?.tools()
@@ -12,7 +15,7 @@ export const agentTools = async <T extends AgentJobSource>(params: AgentToolsPar
         ...builtInTools,
         ...mcpTools,
     }
-    
+
     return {
         tools: async () => {
             return tools
@@ -74,7 +77,7 @@ function createCellsZodSchema(fields: Field[]): z.ZodSchema {
 
     const cellSchemas = fields.map(field => {
         let valueSchema: z.ZodType
-        
+
         switch (field.type) {
             case FieldType.NUMBER: {
                 valueSchema = z.union([
@@ -100,7 +103,7 @@ function createCellsZodSchema(fields: Field[]): z.ZodSchema {
             }
             case FieldType.STATIC_DROPDOWN: {
                 const options = field.data.options.map(option => option.value)
-                valueSchema = options.length > 0 
+                valueSchema = options.length > 0
                     ? z.enum(options as [string, ...string[]])
                     : z.string()
                 break
@@ -111,17 +114,17 @@ function createCellsZodSchema(fields: Field[]): z.ZodSchema {
                 break
             }
         }
-        
+
         return z.object({
             fieldId: z.literal(field.id),
             value: valueSchema,
         })
     })
-    
+
     if (cellSchemas.length === 1) {
         return z.array(cellSchemas[0])
     }
-    
+
     return z.array(z.union([cellSchemas[0], cellSchemas[1], ...cellSchemas.slice(2)]))
 }
 
@@ -162,7 +165,7 @@ async function getStructuredOutput(agent: Agent): Promise<ZodSchema> {
     }
 
     return z.object(shape)
-}   
+}
 
 type AgentToolsParams<T extends AgentJobSource> = {
     publicUrl: string
