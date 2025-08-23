@@ -1,0 +1,116 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "Live Preview",
+			"workspacePath": "d:\\Ai Server\\activepieces",
+			"problemMatcher": [],
+			"label": "Live Preview: Run Server",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
+			"label": "Setup MCP Environment",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-ExecutionPolicy",
+				"Bypass",
+				"-File",
+				"${workspaceFolder}/.vscode/setup-mcp-env.ps1"
+			],
+			"group": "build",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": false
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Test MCP Connections",
+			"type": "shell",
+			"command": "node",
+			"args": [
+				"${workspaceFolder}/.vscode/test-mcp-connection.js"
+			],
+			"group": "test",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": true
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Build Replicate Flux MCP",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"run",
+				"build"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}/replicate-flux-mcp"
+			},
+			"group": "build",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": false
+			},
+			"problemMatcher": ["$tsc"]
+		},
+		{
+			"label": "Install MCP Dependencies",
+			"type": "shell",
+			"command": "npm",
+			"args": [
+				"install"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}/replicate-flux-mcp"
+			},
+			"group": "build",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": false
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "Validate MCP Configuration",
+			"type": "shell",
+			"command": "node",
+			"args": [
+				"-e",
+				"const fs = require('fs'); const path = require('path'); const configs = ['.vscode/mcp.json', '.cursor/mcp.json']; configs.forEach(config => { if (fs.existsSync(config)) { try { JSON.parse(fs.readFileSync(config, 'utf8')); console.log('✓ ' + config + ' is valid'); } catch (e) { console.error('✗ ' + config + ' is invalid: ' + e.message); } } else { console.warn('⚠ ' + config + ' not found'); } });"
+			],
+			"group": "test",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared",
+				"showReuseMessage": true,
+				"clear": true
+			},
+			"problemMatcher": []
+		}
+	]
+}

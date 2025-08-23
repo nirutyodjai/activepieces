@@ -24,6 +24,76 @@
       "env": {
         "REPLICATE_API_TOKEN": "${REPLICATE_API_TOKEN}"
       }
+    },
+    "filesystem-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem@latest",
+        "d:\\Ai Server\\activepieces"
+      ]
+    },
+    "git-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-git@latest",
+        "--repository",
+        "d:\\Ai Server\\activepieces"
+      ]
+    },
+    "postgres-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres@latest"
+      ],
+      "env": {
+        "POSTGRES_CONNECTION_STRING": "${POSTGRES_CONNECTION_STRING}"
+      }
+    },
+    "sqlite-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sqlite@latest",
+        "--db-path",
+        "d:\\Ai Server\\activepieces\\app\\data\\powertech.db"
+      ]
+    },
+    "brave-search-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-brave-search@latest"
+      ],
+      "env": {
+        "BRAVE_API_KEY": "${BRAVE_API_KEY}"
+      }
+    },
+    "github-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github@latest"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
+      }
+    },
+    "puppeteer-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-puppeteer@latest"
+      ]
+    },
+    "memory-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-memory@latest"
+      ]
     }
   }
 }
